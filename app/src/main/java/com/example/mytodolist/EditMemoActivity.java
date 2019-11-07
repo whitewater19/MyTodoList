@@ -13,7 +13,10 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class EditMemoActivity extends AppCompatActivity implements View.OnClickListener {
     TextView txtTitle;
@@ -26,12 +29,18 @@ public class EditMemoActivity extends AppCompatActivity implements View.OnClickL
     ArrayList<Colordata> color_list;
     String selected_color;
 
+    String new_memo, currentTime;
+    DateFormat df = new SimpleDateFormat("yyyy-MM-dd  HH:mm");
+    int index;
+    private DbAdapter dbAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_memo);
 
         initView();
+        dbAdapter=new DbAdapter(this);
 
         btn_back=findViewById(R.id.btn_back);
         btn_ok=findViewById(R.id.btn_ok);
@@ -76,7 +85,19 @@ public class EditMemoActivity extends AppCompatActivity implements View.OnClickL
                 finish();
                 break;
             case R.id.btn_ok:{
+                currentTime=df.format(new Date(System.currentTimeMillis()));
+                new_memo = edtmemo.getText().toString();
 
+                try {
+                    //呼叫adapter的方法處理新增
+                    dbAdapter.creatMemo(currentTime, new_memo, null, selected_color);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    //回到列表
+                    Intent i = new Intent(this, MainActivity.class);
+                    startActivity(i);
+                }
                 break;
             }
         }
